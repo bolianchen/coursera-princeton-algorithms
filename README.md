@@ -1,7 +1,10 @@
 # Coursera - Princeton Algorithms
 
 ## Environment Setup
-- Add the path of algs4.jar to the CLASSPATH environment variable
+- Add the path of the textbook libraries to the CLASSPATH environment variable
+```
+export CLASSPATH=$PROJECT_FOLDER/textbook_libraries:CLASSPATH
+```
 
 ## Programming Assignments
 ### Hello, World  
