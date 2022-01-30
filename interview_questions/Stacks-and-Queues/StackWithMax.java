@@ -1,51 +1,38 @@
-import edu.princeton.cs.algs4.*;
-
-
-//TODO: array resizing, raise Exceptions
+import edu.princeton.cs.algs4.ResizingArrayStack;
 
 public class StackWithMax {
-    float[] data;
-    int curPos;
-    int maxPos;
+    Float curMax;
+    ResizingArrayStack<Float> data;
+    ResizingArrayStack<Float> maximums;
 
     public StackWithMax() {
-        // ignore the resizing need
-        data = new float[10];
-        int curPos = 0;
-        int maxPos = -1;
+        curMax = null;
+        data = new ResizingArrayStack<>();
+        maximums = new ResizingArrayStack<>();
     }
 
     public void push(float val) {
-        if (val > data[maxPos]) {
-            maxPos = curPos;
+        data.push(val);
+        if (curMax == null) {
+            maximums.push(val);
+            curMax = val;
+        } else {
+            if (curMax >= val) {
+                maximums.push(curMax);
+            } else {
+                maximums.push(val);
+                curMax = val;
+            }
         }
-        data[curPos++] = val;
     }
 
     public float pop() {
-        float result = data[--curPos];
-        if (curPos == maxPos) {
-            maxPos = findMaxIdx();
-        }
-        return result;
+        maximums.pop();
+        return data.pop();
     }
 
     public float max() {
-        return data[maxPos];
-    }
-
-    public int findMaxIdx() {
-        int maxIdx = 0;
-        for (int i=0; i<curPos; i=i+1) {
-            if (data[i] > data[maxIdx]) {
-                maxIdx = i;
-            }
-        }
-        return maxIdx;
-    }
-
-    public boolean isEmpty() {
-        return (curPos == 0);
+        return maximums.peek();
     }
 
     public static void main(String[] args) {
