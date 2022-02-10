@@ -21,4 +21,4 @@ export CLASSPATH=$PROJECT_FOLDER/textbook_libraries:CLASSPATH
 - [my_solution](https://github.com/bolianchen/coursera-princeton-algorithms/tree/main/programming_assignments/collinear) (score 100/100)
 
 ## Course Materials
-under construction
+* Textbook - Algorithms, 4th Edition by Robert Sedgewick and Kevin Wayne; Online content are open to anyone at [the booksite](https://algs4.cs.princeton.edu/home/).
