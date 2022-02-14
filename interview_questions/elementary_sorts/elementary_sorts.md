@@ -1,23 +1,24 @@
-Question1: Intersection of two sets.
+# Elementary Sorts
+## Question1: Intersection of two sets.
 Given two arrays a[] and b[], each containing n distinct 2D points in the plane, design a
 subquadratic algorithm to count the number of points that are contained both in array a[] and array b[].
 
-Answer:
+### *My Answer*:
     - sort a[] and b[] in ascending order ==> 2 * O(nlgn)
     - iterate over a[] and b[] with two separate indices i, j, compare a[i] and b[j]
       make increment to both indices of the arrays when both entries are the same,
       make increment to the index of either array whose entry is smaller ==> 2 * O(n)
 
-Question2: Permutation.
+## Question2: Permutation.
 Given two integer arrays of size n, design a subquadratic algorithm to determine
 whether one is a permutation of the other. That is, do they contain exactly the same entries but,
 possibly, in a different order.
 
-Answer:
+### *My Answer*:
     - sort two arrays => 2 * O(nlgn)
     - iterate the two arrays with one single index, compare every entry => O(n) 
 
-Question3: Dutch national flag.
+## Question3: Dutch national flag.
 Given an array of n buckets, each containing a red, white, or blue pebble, sort them by color.
 The allowed operations are:
     - swap(i,j): swap the pebble in bucket i with the pebble in bucket j.
@@ -28,7 +29,7 @@ The performance requirements are as follows:
     - At most n calls to swap().
     - Constant extra space.
 
-Answer:
+### *My Answer*:
     - maintain an index r to swap next found red flag to, initialize r as 0
     - maintain an index b to swap next found blue flag to, initialize b as n-1
     - iterate the buckets with an index i from the start (i=0)
