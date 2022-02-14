@@ -28,7 +28,7 @@ Sample an random index uniformly between 1 and n, named as s
 ### *hint*
 Use sink() and swim().
 
-##Question3 Taxicab numbers.
+## Question3 Taxicab numbers.
 A taxicab number is an integer that can be expressed as the sum of two cubes of positive integers
 in two different ways: a^3 + b^3 = c^3 + d^3.
 For example, 1729 is the smallest taxicab number: 9^3 + 10^3 = 1^3 + 12^3.
