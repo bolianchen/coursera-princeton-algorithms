@@ -1,45 +1,112 @@
-
+import java.util.Comparator;
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.ResizingArrayStack;
 import edu.princeton.cs.algs4.MinPQ;
 
 public class Solver {
-    private MinPQ<SearchNode> game;
-    private boolean solvable;
+    // the final node after running the Solver constructor
+    private SearchNode node;
 
     // find a solution to the initial board (using the A* algorithm)
-    public Solver(Board initial)
+    public Solver(Board initial) {
+        if (initial == null) {
+            throw new IllegalArgumentException();
+        }
 
-    // Don't enqueue a neighbor if its board is the same as the board of the previous search node
+        MinPQ<SearchNode> searchPool = new MinPQ<>();
+        node = new SearchNode(initial, 0);
+        searchPool.insert(node);
+
+        Board twin = initial.twin();
+        MinPQ<SearchNode> twinSearchPool = new MinPQ<>();
+        SearchNode twinNode = new SearchNode(twin, 0);
+        twinSearchPool.insert(twinNode);
+
+        // run the A* algorithm on the two puzzles, initial and twin, in lockstep
+        while (!node.curBoard.isGoal() && !twinNode.curBoard.isGoal()) {
+            node = search(searchPool);
+            twinNode = search(twinSearchPool);
+        }
+    }
+
+    // Do not enqueue a neighbor if its board is the same as the board of the previous search node
+    private SearchNode search(MinPQ<SearchNode> pool) {
+        SearchNode minNode = pool.delMin();
+        for (Board neighbor: minNode.curBoard.neighbors()) {
+            //if (!node.prevNode.curBoard.equals(neighbor)) {
+            pool.insert(new SearchNode(neighbor, minNode, minNode.numMoves+1));
+            //}
+        }
+        return minNode;
+    }
+
     // Caching the Hamming and Manhattan priorities
-    private class SearchNode {
+    private class SearchNode implements Comparable<SearchNode> {
+        //public static final Comparator<SearchNode> ByHamming = new HammingComparator();
+        //public static final Comparator<SearchNode> ByManhattan = new ManhattanComparator();
         Board curBoard;
+        SearchNode prevNode;
         int numMoves;
-        Board prevBoard;
+        int hamDist;
+        int manhatDist;
 
-        public SearchNode(Board cur, int moves, Board prev) {
+        public SearchNode(Board cur, SearchNode prev, int moves) {
             curBoard = cur;
+            prevNode = prev;
             numMoves = moves;
-            prevBoard = prev;
+            hamDist = cur.hamming();
+            manhatDist = cur.manhattan();
         }
 
         public SearchNode(Board cur, int moves) {
             curBoard = cur;
+            prevNode = null;
             numMoves = moves;
-            prevBoard = null;
+            hamDist = cur.hamming();
+            manhatDist = cur.manhattan();
+        }
+
+        public int compareTo(SearchNode other) {
+            return manhattanPriority().compareTo(other.manhattanPriority());
+        }
+
+        private Integer hammingPriority() {
+            return hamDist + numMoves;
+        }
+        
+        private Integer manhattanPriority() {
+            return manhatDist + numMoves;
         }
     }
 
     // is the initial board solvable? (see below)
-    // in the constructor, use the initial board and its twin to explore search nodes in lockstep for both
-    // if the initial board leads to the goal board, it's solvable;
-    // if its twin leads to the goal board, not solvable
-    public boolean isSolvable()
+    public boolean isSolvable() {
+        return node.curBoard.isGoal();
+    }
 
     // min number of moves to solve initial board; -1 if unsolvable
-    public int moves()
+    public int moves() {
+        if (!isSolvable()) {
+            return -1;
+        }
+        return node.numMoves;
+    }
 
     // sequence of boards in a shortest solution; null if unsolvable
-    public Iterable<Board> solution()
+    public Iterable<Board> solution() {
+        if (!isSolvable()) {
+            return null;
+        }
+        SearchNode iterNode = node;
+        ResizingArrayStack<Board> solMoves = new ResizingArrayStack<>();
+        solMoves.push(iterNode.curBoard);
+        while (iterNode.prevNode != null) {
+            iterNode = iterNode.prevNode;
+            solMoves.push(iterNode.curBoard);
+        }
+        return solMoves;
+    }
 
     // test client (see below) 
     public static void main(String[] args) {

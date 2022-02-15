@@ -9,8 +9,8 @@ import edu.princeton.cs.algs4.ResizingArrayQueue;
  * Performance requirements: all Board methods should be supported in time proportional to n^2 or better
  */
 public class Board {
-    private int[][] tiles;
-    private int n;
+    private final int[][] tiles;
+    private final int n;
 
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
@@ -30,8 +30,12 @@ public class Board {
         // ensure the String cancatenation take linear time
         StringBuilder repr = new StringBuilder(Integer.toString(n) + "\n");
         for (int row = 0; row < n; row++) {
-            // it takes ~n to append each single row
-            repr.append(Arrays.toString(tiles[row]));
+            for (int col = 0; col < n; col++) {
+                repr.append(tiles[row][col]);
+                if (col != n-1) {
+                    repr.append(" ");
+                }
+            }
             // do not add newline to the last row
             if (row!=n-1) {
                 repr.append("\n");
@@ -109,14 +113,13 @@ public class Board {
 
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
-                if ((i!=j) && (i!=-j) && validNeighbor(blankRow+i, blankCol+j)) {
+                if ((i!=j) && (i!=-j) && validCoords(blankRow+i, blankCol+j)) {
                     exch(blankRow, blankCol, blankRow+i, blankCol+j);
                     neighbors.enqueue(new Board(tiles));
                     exch(blankRow, blankCol, blankRow+i, blankCol+j);
                 }
             }
         }
-
         return neighbors;
     }
 
@@ -135,7 +138,8 @@ public class Board {
         return coords;
     }
 
-    private boolean validNeighbor(int row, int col) {
+    // check if the coordinates valid
+    private boolean validCoords(int row, int col) {
         return (row>=0 && row<n && col>=0 && col<n);
     }
 
@@ -150,7 +154,19 @@ public class Board {
     // a board that is obtained by exchanging any pair of tiles(the blank square is not a tile)
     // a board is solvable iff its twin is not
     public Board twin() {
-        return new Board(tiles);
+        int idx1 = 0;
+        int idx2 = 1;
+        for (int i = 0; i < n*n -1; i++) {
+            idx1 = i;
+            idx2 = i+1;
+            if (tiles[idx1/n][idx1%n] != 0 && tiles[idx2/n][idx2%n] != 0) {
+                break;
+            }
+        }
+        exch(idx1/n, idx1%n, idx2/n, idx2%n);
+        Board twinBoard = new Board(tiles);
+        exch(idx1/n, idx1%n, idx2/n, idx2%n);
+        return twinBoard;
     }
 
     // unit testing (not graded)
@@ -194,5 +210,9 @@ public class Board {
         System.out.println("Board other2=" + other2);
         System.out.println(b.equals(other1));
         System.out.println(b.equals(other2));
+        // Test the twin method
+        System.out.println("Board this=" + b);
+        System.out.println("Board twin=" + b.twin());
+        System.out.println("Board this=" + b);
     }
 }
