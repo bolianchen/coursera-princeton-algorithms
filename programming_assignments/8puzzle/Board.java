@@ -1,7 +1,4 @@
 import java.util.Arrays;
-import java.lang.StringBuilder;
-import java.lang.Math;
-
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.ResizingArrayQueue;
 
@@ -37,7 +34,7 @@ public class Board {
                 }
             }
             // do not add newline to the last row
-            if (row!=n-1) {
+            if (row != n-1) {
                 repr.append("\n");
             }
         }
@@ -55,7 +52,7 @@ public class Board {
     public int hamming() {
         int hamDist = 0;
         for (int i = 0; i < n*n - 1; i++) {
-            if (tiles[i/n][i%n] != i + 1) {
+            if (tiles[i/n][i % n] != i + 1) {
                 hamDist += 1;
             }
         }
@@ -67,11 +64,11 @@ public class Board {
     public int manhattan() {
         int manhatDist = 0;
         for (int i = 0; i <= n*n - 1; i++) {
-            int target = tiles[i/n][i%n];
+            int target = tiles[i/n][i % n];
             if (target != 0) {
                 int targetGoalRow = (target-1)/n;
-                int targetGoalCol = (target-1)%n;
-                manhatDist += Math.abs(targetGoalRow-i/n) + Math.abs(targetGoalCol-i%n);
+                int targetGoalCol = (target-1) % n;
+                manhatDist += Math.abs(targetGoalRow - i/n) + Math.abs(targetGoalCol - i % n);
             }
         }
         return manhatDist;
@@ -81,7 +78,7 @@ public class Board {
     // runtime ~ n^2
     public boolean isGoal() {
         for (int i = 0; i < n*n - 1; i++) {
-            if (tiles[i/n][i%n] != i + 1) {
+            if (tiles[i/n][i % n] != i + 1) {
                 return false;
             }
         }
@@ -91,7 +88,11 @@ public class Board {
     // does this board equal y?
     // runtime ~ n^2
     public boolean equals(Object y) {
-        if (y instanceof Board) {
+        // return false when argument is null
+        if (y == null) {
+            return false;
+        }
+        if (this.getClass() == y.getClass()) {
             Board other = (Board) y;
             if (other.dimension() != n) {
                 return false;
@@ -113,7 +114,7 @@ public class Board {
 
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
-                if ((i!=j) && (i!=-j) && validCoords(blankRow+i, blankCol+j)) {
+                if ((i != j) && (i != -j) && validCoords(blankRow+i, blankCol+j)) {
                     exch(blankRow, blankCol, blankRow+i, blankCol+j);
                     neighbors.enqueue(new Board(tiles));
                     exch(blankRow, blankCol, blankRow+i, blankCol+j);
@@ -140,7 +141,7 @@ public class Board {
 
     // check if the coordinates valid
     private boolean validCoords(int row, int col) {
-        return (row>=0 && row<n && col>=0 && col<n);
+        return (row >= 0 && row < n && col >= 0 && col < n);
     }
 
     // swap contents between (row1, col1) and (row2, col2)
@@ -159,13 +160,13 @@ public class Board {
         for (int i = 0; i < n*n -1; i++) {
             idx1 = i;
             idx2 = i+1;
-            if (tiles[idx1/n][idx1%n] != 0 && tiles[idx2/n][idx2%n] != 0) {
+            if (tiles[idx1/n][idx1 % n] != 0 && tiles[idx2/n][idx2 % n] != 0) {
                 break;
             }
         }
-        exch(idx1/n, idx1%n, idx2/n, idx2%n);
+        exch(idx1/n, idx1 % n, idx2/n, idx2 % n);
         Board twinBoard = new Board(tiles);
-        exch(idx1/n, idx1%n, idx2/n, idx2%n);
+        exch(idx1/n, idx1 % n, idx2/n, idx2 % n);
         return twinBoard;
     }
 
@@ -176,7 +177,7 @@ public class Board {
         int[] elements = in.readAllInts();
         int[][] tiles = new int[sz][sz];
         for (int i = 0; i < elements.length; i++) {
-            tiles[i/sz][i%sz] = elements[i];
+            tiles[i/sz][i % sz] = elements[i];
         }
         Board b = new Board(tiles);
 

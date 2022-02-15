@@ -1,4 +1,3 @@
-import java.util.Comparator;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.ResizingArrayStack;
@@ -34,49 +33,42 @@ public class Solver {
     private SearchNode search(MinPQ<SearchNode> pool) {
         SearchNode minNode = pool.delMin();
         for (Board neighbor: minNode.curBoard.neighbors()) {
-            //if (!node.prevNode.curBoard.equals(neighbor)) {
-            pool.insert(new SearchNode(neighbor, minNode, minNode.numMoves+1));
-            //}
+            if (minNode.prevNode == null || !minNode.prevNode.curBoard.equals(neighbor)) {
+                pool.insert(new SearchNode(neighbor, minNode, minNode.numMoves+1));
+            }
         }
         return minNode;
     }
 
     // Caching the Hamming and Manhattan priorities
     private class SearchNode implements Comparable<SearchNode> {
-        //public static final Comparator<SearchNode> ByHamming = new HammingComparator();
-        //public static final Comparator<SearchNode> ByManhattan = new ManhattanComparator();
         Board curBoard;
         SearchNode prevNode;
         int numMoves;
-        int hamDist;
-        int manhatDist;
+        int dist;
 
         public SearchNode(Board cur, SearchNode prev, int moves) {
             curBoard = cur;
             prevNode = prev;
             numMoves = moves;
-            hamDist = cur.hamming();
-            manhatDist = cur.manhattan();
+            // use Manhattan distance, can be replaced with cur.hamming();
+            dist = cur.manhattan();
         }
 
         public SearchNode(Board cur, int moves) {
             curBoard = cur;
             prevNode = null;
             numMoves = moves;
-            hamDist = cur.hamming();
-            manhatDist = cur.manhattan();
+            // use Manhattan distance, can be replaced with cur.hamming();
+            dist = cur.manhattan();
         }
 
         public int compareTo(SearchNode other) {
-            return manhattanPriority().compareTo(other.manhattanPriority());
+            return Integer.compare(priority(), other.priority());
         }
 
-        private Integer hammingPriority() {
-            return hamDist + numMoves;
-        }
-        
-        private Integer manhattanPriority() {
-            return manhatDist + numMoves;
+        private int priority() {
+            return dist + numMoves;
         }
     }
 
@@ -110,25 +102,25 @@ public class Solver {
 
     // test client (see below) 
     public static void main(String[] args) {
-	// create initial board from file
-	In in = new In(args[0]);
-	int n = in.readInt();
-	int[][] tiles = new int[n][n];
-	for (int i = 0; i < n; i++)
-	    for (int j = 0; j < n; j++)
-		tiles[i][j] = in.readInt();
-	Board initial = new Board(tiles);
+        // create initial board from file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        int[][] tiles = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                tiles[i][j] = in.readInt();
+        Board initial = new Board(tiles);
 
-	// solve the puzzle
-	Solver solver = new Solver(initial);
+        // solve the puzzle
+        Solver solver = new Solver(initial);
 
-	// print solution to standard output
-	if (!solver.isSolvable())
-	    StdOut.println("No solution possible");
-	else {
-	    StdOut.println("Minimum number of moves = " + solver.moves());
-	    for (Board board : solver.solution())
-		StdOut.println(board);
-	}
+        // print solution to standard output
+        if (!solver.isSolvable())
+            StdOut.println("No solution possible");
+        else {
+            StdOut.println("Minimum number of moves = " + solver.moves());
+            for (Board board : solver.solution())
+                StdOut.println(board);
+        }
     }
 }
