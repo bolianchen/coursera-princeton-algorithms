@@ -29,9 +29,7 @@ Use extra space proportional to the height of the tree.
 
 ### *my answer*
 
-The results of in-order traversal are ascendingly sorted entries <=> BST ?
-
-
+A binary tree is a binary search tree if and only if it has a sorted inorder traversal sequence.
 
 Do in-order traversal recursively on the binary tree, return false once an element strictly larger than
 its previous element found. The extra space is the function call stack for recursion, which is 
@@ -46,7 +44,19 @@ Design an algorithm to perform an inorder traversal of a binary search tree usin
 only a constant amount of extra space.
 
 ### *my answer*
-?
+Method#1: Make nodes in the binary trees also store pointer to its parent
+    if left child is not null
+        go left
+    else
+        if right is not null
+            go right
+        else
+            go to parent
+            while parent's right child is the current node
+                if parent is not null
+                    go to parent
+                else
+Method#2 Moris Traversal
 
 ### *hint*
 you may modify the BST during the traversal provided you restore it upon completion
