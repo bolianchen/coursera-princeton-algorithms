@@ -5,6 +5,7 @@ Describe how to save the memory for storing the color information when implement
 ### *my answer*
 
 ### *hint*
+modify the structure of the BST to encode the color information.
 
 ## Question2 Document search
 Design an algorithm that takes a sequence of n document words and a sequence of m query words
@@ -21,6 +22,8 @@ The length of an interval is the number of words in that interval.
 
 
 ### *hint*
+for each word, maintain a sorted list of the indices in the document in which that word appears.
+Scan through the sorted lists of the query words in a judicious manner.
 
 ## Question3 Generalized queue
 Design a generalized queue data type that supports all of the following operations
@@ -41,5 +44,6 @@ use an array-based list to maintain the indices of the data currently in the BST
 
 ### *my answer*
 
-
 ### *hint*
+create a red–black BST where the keys are integers and the values are the items such that
+the ith largest integer key in the red–black BST corresponds to the ith item in the queue.
