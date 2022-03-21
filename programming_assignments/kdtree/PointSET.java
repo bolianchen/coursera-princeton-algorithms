@@ -48,7 +48,6 @@ public class PointSET {
 
     // draw all points to standard draw 
     public void draw() {
-        //StdDraw.setPenRadius(0.05);
         for (Point2D p: points) {
             p.draw();
         }
@@ -76,9 +75,9 @@ public class PointSET {
         double shortestDist = Double.POSITIVE_INFINITY;
         Point2D nearestNeighbor = null;
         for (Point2D point: points) {
-            if (p.distanceTo(point) < shortestDist) {
+            if (p.distanceSquaredTo(point) < shortestDist) {
                 nearestNeighbor = point;
-                shortestDist = p.distanceTo(point);
+                shortestDist = p.distanceSquaredTo(point);
             }
         }
         return nearestNeighbor;
