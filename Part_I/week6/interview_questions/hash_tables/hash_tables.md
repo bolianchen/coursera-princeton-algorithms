@@ -2,63 +2,44 @@
 
 ## ****Question 1****
 
-****4-SUM.**** Given an array  *a*[ ] of *n* integers, the 4-SUM problem is to determine if there exist distinct indices *i*, *j*, *k*, and *l* such that *a*[*i*]+*a*[*j*]=*a*[*k*]+*a*[*l*]. Design an algorithm for the 4-SUM problem that takes time proportional to $n^2$ (under suitable technical assumptions).
+****4-SUM.**** Given an array  *a*[ ] of *n* integers, the 4-SUM problem is to determine if there exist distinct indices *i*, *j*, *k*, and *l* such that *a*[*i*]+*a*[*j*]=*a*[*k*]+*a*[*l*]. Design an algorithm for the 4-SUM problem that takes time proportional to n^2 (under suitable technical assumptions).
 
-### **Brute Force Solution**
+### Answer
 
+#### Brute Force Solution
+<pre>
 function bruteForce(a[])
-
-for i=0 to n-1
-
-    for j=i+1 to n-1
-
-        for k=j+1 to n-1
-
-            for l=k+1 to n-1
-
-                if a[i]+a[j]=a[k]+a[l] then return true
-
-                endif
-
-            next l
-
-        next k
-
-    next j
-
-next i
-
-return false
-
+    for i=0 to n-1
+        for j=i+1 to n-1
+            for k=j+1 to n-1
+                for l=k+1 to n-1
+                    if a[i]+a[j]=a[k]+a[l] then return true
+                    endif
+                next l
+            next k
+        next j
+    next i
+    return false
 endfunction
+</pre>
 
+#### n^2 Solution
 Without loss of generality, we can assume there are no negative integers. We can always add a large value to ensure non-negativity.
-
-### n^2 Solution
-
+<pre>
 function effectiveFourSum(a[])
-
-asendSort(a[])  // sort the array in ascending order
-
-s=HashSet
-
-for i=0 to n-1
-
-for j=i to n-1
-
-if s.contains(a[i] + a[j])
-
-return true;
-
-else
-
-s.add(a[i] + a[j])
-
-endif
-
-next j
-
-next i
+    m=HashMap<int, int[]>
+    for i=0 to n-1
+        for j=i to n-1
+            if m.containsKey(a[i] + a[j])
+                value = m.get(a[i] + a[j])
+                if value[0]!=i and value[1]!=j
+                    return true;
+                endif
+        next j
+    next i
+    return false;
+endfunction
+</pre>
 
 ## Question 2
 
@@ -67,6 +48,8 @@ next i
 - Describe what happens if you override hashCode() but not equals().
 - Describe what happens if you override equals() but not hashCode().
 - Describe what happens if you override hashCode() but implement public boolean equals(OlympicAthlete that) instead of public boolean equals(Object that).
+
+### Answer
 
 A basic requirement for clients to be able to use hashCode() for symbol tables. Given two data type references a and b, if a.equals(b) is true, then a.hashCode() must have the same numerical value as b.hashCode().
 
