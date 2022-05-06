@@ -40,9 +40,6 @@ public class SAP {
     }
 
     private int[] sapHelper(int v, int w) {
-        if !(v!=null && w!=null) {
-            throw new IllegalArgumentException("v or w argument is null");
-        }
         if ((v<0 || v >= diGraph.V()) || (w<0 || w >= diGraph.V())) {
             throw new IllegalArgumentException("v or w argument is out of range");
         }
@@ -61,17 +58,24 @@ public class SAP {
                     "v or w argument is null");
         }
 
-        for (int i:v) {
+        for (Integer i:v) {
             if (i<0 || i>= diGraph.V()) {
                 throw new IllegalArgumentException(
                         "a integer in v is out of range");
             }
-            // TODO: check if any item is null
+            if (i==null){
+                throw new IllegalArgumentException(
+                        "v contains a null item");
+            }
         }
-        for (int i:w) {
+        for (Integer i:w) {
             if (i<0 || i>= diGraph.V()) {
                 throw new IllegalArgumentException(
                         "a integer in w is out of range");
+            }
+            if (i==null){
+                throw new IllegalArgumentException(
+                        "w contains a null item");
             }
         }
 
