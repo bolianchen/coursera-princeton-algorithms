@@ -1,28 +1,24 @@
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.ArrayList;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Digraph;
-import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.DirectedCycle;
 
 public class WordNet {
 
     //BST-based symbol table to store noun - synsetIds pairs
-    private TreeMap<String, List<Integer>> nounToIds;
+    private final TreeMap<String, List<Integer>> nounToIds;
     // An array to store all the synsets
-    private ArrayList<String> synsetsList;
+    private final ArrayList<String> synsetsList;
     // a Digraph representing the hypernym relationships
-    private Digraph synsetIdsGraph;
     // a SAP object to find the shortest common ancestor
     // and the length of the shortest ancestral path
-    private SAP sapOfWordNet;
+    private final SAP sapOfWordNet;
     // number of synsets
-    private int synsetCount;
 
     // constructor takes the name of the two input files
-    public WordNet(String synsets, String hypernyms){
+    public WordNet(String synsets, String hypernyms) {
 
         // initialize the data structures as empty
         nounToIds = new TreeMap<>();
@@ -31,15 +27,14 @@ public class WordNet {
         // build nounToIds and synsetsList
         In synsetsFileHandler = new In(synsets);
         String[] linesOfSynsets = synsetsFileHandler.readAllLines();
-        synsetCount = linesOfSynsets.length;
+        int synsetCount = linesOfSynsets.length;
 
-        for (int i=0; i<synsetCount; i+=1) {
+        for (int i = 0; i < synsetCount; i += 1) {
             String[] synsetInfo = linesOfSynsets[i].split(",");
-            int id = Integer.parseInt(synsetInfo[0]);
             String synset = synsetInfo[1];
             synsetsList.add(synset);
             String[] nouns = synset.split(" ");
-            for (int j=0; j<nouns.length; j+=1) {
+            for (int j = 0; j < nouns.length; j += 1) {
                 if (!nounToIds.containsKey(nouns[j])) {
                     nounToIds.put(nouns[j], new ArrayList<Integer>());
                 }
@@ -50,10 +45,10 @@ public class WordNet {
         // build synsetIdsGraph
         In hypernymsFileHandler = new In(hypernyms);
         String[] linesOfHypernyms = hypernymsFileHandler.readAllLines();
-        synsetIdsGraph = new Digraph(synsetCount);
-        for (int i=0; i<linesOfHypernyms.length; i+=1) {
+        Digraph synsetIdsGraph = new Digraph(synsetCount);
+        for (int i = 0; i < linesOfHypernyms.length; i += 1) {
             String[] idsOfHypernyms = linesOfHypernyms[i].split(",");
-            for (int j=1; j<idsOfHypernyms.length; j+=1) {
+            for (int j = 1; j < idsOfHypernyms.length; j += 1) {
                 int hyponymId = Integer.parseInt(idsOfHypernyms[0]);
                 int hypernymId = Integer.parseInt(idsOfHypernyms[j]);
                 synsetIdsGraph.addEdge(hyponymId, hypernymId);
@@ -74,27 +69,18 @@ public class WordNet {
             return false;
         }
 
-        boolean iIsRoot;
-        for (int i=0; i<graph.V(); i+=1) {
+        // if more than one roots found, its not a rooted Graph
+        int rootCount = 0;
+        for (int i = 0; i < graph.V(); i += 1) {
             // only do further check a vertex having 0 outdegree
             if (graph.outdegree(i) == 0) {
-                iIsRoot = true;
-                Digraph reversedGraph = graph.reverse();
-                BreadthFirstDirectedPaths bfsReversedGraph =
-                    new BreadthFirstDirectedPaths(reversedGraph, i);
-                // vertex i is not a root if it has no paths to any verteices
-                for (int j=0; j<reversedGraph.V(); j+=1) {
-                    if (!bfsReversedGraph.hasPathTo(j)) {
-                        iIsRoot = false;
-                        break;
-                    }
-                }
-                if (iIsRoot) {
-                    return true;
+                rootCount += 1;
+                if (rootCount >= 2) {
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     // returns all WordNet nouns
@@ -104,7 +90,7 @@ public class WordNet {
 
     // is the word a WordNet noun?
     public boolean isNoun(String word) {
-        if (word==null) {
+        if (word == null) {
             throw new IllegalArgumentException("word argument can not be null");
         }
         return nounToIds.containsKey(word);
@@ -112,7 +98,7 @@ public class WordNet {
 
     // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
-        if (nounA==null || nounB==null) {
+        if (nounA == null || nounB == null) {
             throw new IllegalArgumentException(
                     "nounA or nounB argument can not be null");
         }
@@ -129,7 +115,7 @@ public class WordNet {
     // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
     // in a shortest ancestral path (defined below)
     public String sap(String nounA, String nounB) {
-        if (nounA==null || nounB==null) {
+        if (nounA == null || nounB == null) {
             throw new IllegalArgumentException(
                     "the nounA or nounB argument can not be null");
         }

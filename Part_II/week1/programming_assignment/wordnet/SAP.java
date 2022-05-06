@@ -5,18 +5,18 @@ import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 
 public class SAP {
     // the data type should use space proportional to E + V
-    private Digraph diGraph;
-    private int vertexCount;
+    private final Digraph diGraph;
+    private final int vertexCount;
 
     // All methods (and the constructor) should take time
     // at most proportional to E + V in the worst case
     // constructor takes a digraph (not necessarily a DAG)
     public SAP(Digraph G) {
-        if (G==null) {
+        if (G == null) {
             throw new IllegalArgumentException("input directed graph is null");
         }
-        diGraph = G;
-        vertexCount = G.V();
+        diGraph = new Digraph(G);
+        vertexCount = diGraph.V();
     }
 
     // length of shortest ancestral path between v and w; -1 if no such path
@@ -40,7 +40,7 @@ public class SAP {
     }
 
     private int[] sapHelper(int v, int w) {
-        if ((v<0 || v >= diGraph.V()) || (w<0 || w >= diGraph.V())) {
+        if ((v < 0 || v >= diGraph.V()) || (w < 0 || w >= diGraph.V())) {
             throw new IllegalArgumentException("v or w argument is out of range");
         }
         // construct two bfs instances
@@ -53,30 +53,38 @@ public class SAP {
     }
 
     private int[] sapHelper(Iterable<Integer> v, Iterable<Integer> w) {
-        if (v==null || w==null) {
+        if (v == null || w == null) {
             throw new IllegalArgumentException(
                     "v or w argument is null");
         }
+        int vSize = 0;
+        int wSize = 0;
 
         for (Integer i:v) {
-            if (i<0 || i>= diGraph.V()) {
-                throw new IllegalArgumentException(
-                        "a integer in v is out of range");
-            }
-            if (i==null){
+            if (i == null) {
                 throw new IllegalArgumentException(
                         "v contains a null item");
             }
+            if (i < 0 || i >= diGraph.V()) {
+                throw new IllegalArgumentException(
+                        "a integer in v is out of range");
+            }
+            vSize += 1;
         }
         for (Integer i:w) {
-            if (i<0 || i>= diGraph.V()) {
-                throw new IllegalArgumentException(
-                        "a integer in w is out of range");
-            }
-            if (i==null){
+            if (i == null) {
                 throw new IllegalArgumentException(
                         "w contains a null item");
             }
+            if (i < 0 || i >= diGraph.V()) {
+                throw new IllegalArgumentException(
+                        "a integer in w is out of range");
+            }
+            wSize += 1;
+        }
+
+        if (vSize == 0 || wSize == 0) {
+            return new int[]{-1, -1};
         }
 
         // construct two bfs instances
@@ -94,7 +102,7 @@ public class SAP {
         int minDistBetweenVertices = -1;
         int sumDistToAncestor;
         int ancestorId = -1;
-        for (int i=0; i<this.vertexCount; i+=1) {
+        for (int i = 0; i < this.vertexCount; i += 1) {
             if (bfs1.hasPathTo(i) && bfs2.hasPathTo(i)) {
                 sumDistToAncestor = bfs1.distTo(i) + bfs2.distTo(i);
                 if (minDistBetweenVertices == -1
@@ -114,18 +122,11 @@ public class SAP {
         Digraph g = new Digraph(in);
         SAP sap = new SAP(g);
         // digraph25.txt
-        //Integer[] v = {13, 23, 24};
-        //Integer[] w = {6, 16, 17};
-        // toy_graph1.txt
-        //int v = 3;
-        //int w = 10;
-        // toy_graph1.txt
-        int v = 1;
-        int w = 5;
-
-        System.out.println("length of the shortest ancestral path = "
-                + sap.length(Arrays.asList(v), Arrays.asList(w)));
-        System.out.println("shortest common ancestor = "
-                + sap.ancestor(Arrays.asList(v), Arrays.asList(w)));
+        // Integer[] v = {13, 23, 24};
+        // Integer[] w = {6, 16, 17};
+        //System.out.println("length of the shortest ancestral path = "
+        //        + sap.length(Arrays.asList(v), Arrays.asList(w)));
+        //System.out.println("shortest common ancestor = "
+        //        + sap.ancestor(Arrays.asList(v), Arrays.asList(w)));
     }
 }
