@@ -10,16 +10,16 @@ import edu.princeton.cs.algs4.DirectedCycle;
 public class WordNet {
 
     //BST-based symbol table to store noun - synsetIds pairs
-    TreeMap<String, List<Integer>> nounToIds;
+    private TreeMap<String, List<Integer>> nounToIds;
     // An array to store all the synsets
-    ArrayList<String> synsetsList;
+    private ArrayList<String> synsetsList;
     // a Digraph representing the hypernym relationships
-    Digraph synsetIdsGraph;
+    private Digraph synsetIdsGraph;
     // a SAP object to find the shortest common ancestor
     // and the length of the shortest ancestral path
-    SAP sapOfWordNet;
+    private SAP sapOfWordNet;
     // number of synsets
-    int synsetCount;
+    private int synsetCount;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms){

@@ -5,8 +5,8 @@ import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 
 public class SAP {
     // the data type should use space proportional to E + V
-    Digraph diGraph;
-    int vertexCount;
+    private Digraph diGraph;
+    private int vertexCount;
 
     // All methods (and the constructor) should take time
     // at most proportional to E + V in the worst case
