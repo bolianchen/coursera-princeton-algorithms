@@ -34,7 +34,7 @@ Let the edge-weighted digraph as G.
 
 **Shortest path with one skippable edge.** Given an edge-weighted digraph, design an *E*log*V* algorithm to find a shortest path from *s* to *t* where you can change the weight of any one edge to zero. Assume the edge weights are nonnegative.
 
->```💡 Reference: [https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge(https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge)```
+>```💡 Reference: https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge```
 
 >```💡 Hint: compute the shortest path from *s* to every vertex; compute the shortest path from every vertex to *t*; combine.```
 
