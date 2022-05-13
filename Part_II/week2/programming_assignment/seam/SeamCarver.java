@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.LinkedList;
 import edu.princeton.cs.algs4.DirectedEdge;
 import edu.princeton.cs.algs4.EdgeWeightedDigraph;
 import edu.princeton.cs.algs4.AcyclicSP;
@@ -96,117 +97,90 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        int row;
-        int col;
-        double pixEnergy;
-        EdgeWeightedDigraph g = new EdgeWeightedDigraph(2 + width() * height());
-        for (int v = 0; v <= width() * height(); v += 1) {
-            if (v == 0) {
-                for (row = 0; row < height(); row += 1) {
-                    col = 0;
-                    int w = cvtPixCoordsToVertex(col, row);
-                    DirectedEdge e = new DirectedEdge(v, w, 0);
-                    g.addEdge(e);
-                }
-            } else {
-                row = (v - 1) / width();
-                col = (v - 1) % width();
-                pixEnergy = energy(col, row);
-                if (col == width() - 1) {
-                    DirectedEdge e = new DirectedEdge(
-                            v, 1 + width() * height(), pixEnergy);
-                    g.addEdge(e);
-                } else {
-                    for (int i = -1; i <= 1; i += 1) {
-                        if (row + i >= 0 && row + i <= height() -1) {
-                            int w = cvtPixCoordsToVertex(col + 1, row + i);
-                            DirectedEdge e = new DirectedEdge(v, w, pixEnergy);
-                            g.addEdge(e);
-                        }
-                    }
-                }
-            }
-        }
-        AcyclicSP asp = new AcyclicSP(g, 0);
-        int[] seam = new int[width()];
-        int idx = 0;
-        for (DirectedEdge e : asp.pathTo(1 + width() * height())) {
-            if (e.from() != 0) {
-                seam[idx] = (e.from() - 1) / width();
-                idx += 1;
-            }
-        }
+        transposeCurrPic();
+        int[] seam = findVerticalSeam();
+        transposeCurrPic();
         return seam;
+    }
+
+    private void transposeCurrPic() {
+        Picture transPic = new Picture(height(), width());
+        for (int row = 0; row < height(); row += 1) {
+            for (int col = 0; col < width(); col += 1) {
+                transPic.setRGB(row, col, currPic.getRGB(col, row));
+            }
+        }
+        currPic = transPic;
     }
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        int row;
-        int col;
-        double pixEnergy;
-        EdgeWeightedDigraph g = new EdgeWeightedDigraph(2 + width() * height());
-        for (int v = 0; v <= width() * height(); v += 1) {
-            if (v == 0) {
-                for (col = 0; col < width(); col += 1) {
-                    row = 0;
-                    int w = cvtPixCoordsToVertex(col, row);
-                    DirectedEdge e = new DirectedEdge(v, w, 0);
-                    g.addEdge(e);
-                }
-            } else {
-                row = (v - 1) / width();
-                col = (v - 1) % width();
-                pixEnergy = energy(col, row);
-                if (row == height() - 1) {
-                    DirectedEdge e = new DirectedEdge(
-                            v, 1 + width() * height(), pixEnergy);
-                    g.addEdge(e);
+        // initialize a energy map
+        double[][] energy = new double[width()][height()];
+        for (int row = 0; row < height(); row += 1) {
+            for (int col = 0; col < width(); col += 1) {
+                energy[col][row] = energy(col, row);
+            }
+        }
+
+        double[][] distTo = new double[width()][height()];
+        int[][] colTo = new int[width()][height()];
+        for (int row = 0; row < height(); row += 1) {
+            for (int col = 0; col < width(); col += 1) {
+                if (row == 0) {
+                    // all the pixels at 0th row are defined as sources
+                    distTo[col][row] = 0;
+                    colTo[col][row] = -1;
                 } else {
-                    for (int i = -1; i <= 1; i += 1) {
-                        if (col + i >= 0 && col + i <= width() -1) {
-                            int w = cvtPixCoordsToVertex(col + i, row + 1);
-                            DirectedEdge e = new DirectedEdge(v, w, pixEnergy);
-                            g.addEdge(e);
+                    distTo[col][row] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+
+        // do relaxation
+        for (int row = 0; row < height() - 1; row += 1) {
+            for (int col = 0; col < width(); col += 1) {
+                // relax at most 3 edges for each pixel
+                for (int i = -1; i <= 1; i += 1) {
+                    if (col + i >= 0 && col + i < width()) {
+                        if (distTo[col + i][row + 1] >
+                                distTo[col][row] + energy[col + i][row + 1]) {
+                            distTo[col + i][row + 1] = 
+                                distTo[col][row] + energy[col + i][row + 1];
+                            colTo[col + i][row + 1] = col;
                         }
                     }
                 }
             }
         }
-        AcyclicSP asp = new AcyclicSP(g, 0);
-        int[] seam = new int[height()];
-        int idx = 0;
-        for (DirectedEdge e : asp.pathTo(1 + width() * height())) {
-            if (e.from() != 0) {
-                seam[idx] = (e.from() - 1) % width();
-                idx += 1;
+
+        // find the colum index for the minimum distance at the bottom row
+        int colOfMin = 0;
+        double minDist = distTo[colOfMin][height() - 1];
+        for (int col = 1; col < width(); col += 1) {
+            if (distTo[col][height() - 1] < minDist) {
+                colOfMin = col;
+                minDist = distTo[col][height() - 1];
             }
         }
-        return seam;
-    }
 
-    private int cvtPixCoordsToVertex(int col, int row) {
-        return 1 + row * width() + col;
+
+        // collect seam entries
+        int[] seam = new int[height()];
+        for (int row = height() - 1; row >= 0; row -= 1) {
+            seam[row] = colOfMin;
+            colOfMin = colTo[colOfMin][row];
+        }
+
+        return seam;
     }
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-
-        checkSeamValidity(seam, "horizontal");
-
-        // create a all-black Picture whose height is less than currPic by 1
-        Picture newPic = new Picture(width(), height() - 1);
-        // set its color according to the color the kept part of currPic
-        int rowNewPic;
-        for (int col = 0; col < width(); col += 1) {
-            rowNewPic = 0;
-            for (int row = 0; row < height(); row += 1) {
-                if (row != seam[col]) {
-                    newPic.setRGB(col, rowNewPic, currPic.getRGB(col, row));
-                    rowNewPic += 1;
-                }
-            }
-        }
-        currPic = newPic;
+        transposeCurrPic();
+        checkSeamValidity(seam, "vertical");
+        removeVerticalSeam(seam);
+        transposeCurrPic();
     }
 
     // remove vertical seam from current picture
@@ -276,8 +250,10 @@ public class SeamCarver {
         //int row = Integer.parseInt(args[2]);
         //double scEnergy = sc.energy(col, row);
         //System.out.println(scEnergy);
-        int[] s = sc.findVerticalSeam();
-        sc.removeVerticalSeam(s);
+        int[] vs = sc.findVerticalSeam();
+        System.out.println(Arrays.toString(vs));
+        int[] hs = sc.findHorizontalSeam();
+        System.out.println(Arrays.toString(hs));
 
 
     }
