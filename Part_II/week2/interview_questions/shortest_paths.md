@@ -1,20 +1,10 @@
 # Interview Questions: Shortest Paths
 
-ContinuingDays: 6
-CreatedTime: May 2, 2022 1:16 PM
-References: Interview%20Questions%20Shortest%20Paths%2006f646d807a14f63abd9c0c13c64a464/44ShortestPaths.pdf
-Source: Course
-Status: In Progress
-Tags: Programming
-
 ## ****Question 1****
 
 **Monotonic shortest path.** Given an edge-weighted digraph *G*, design an *E*log*E* algorithm to find a *monotonic* shortest path from *s* to every other vertex. A path is *monotonic* if the sequence of edge weights along the path are either strictly increasing or strictly decreasing.
 
-<aside>
-💡 *Hint* : Relax edges in ascending order and find a best path; then relax edges in descending order and find a best path.
-
-</aside>
+>```💡 Hint : Relax edges in ascending order and find a best path; then relax edges in descending order and find a best path.```
 
 ## Answer
 
@@ -29,10 +19,7 @@ Since a priority queue would be used to store edges and to query them. The numbe
 
 **Second shortest path.** Given an edge-weighted digraph and let *P* be a shortest path from vertex *s* to vertex *t*. Design an *E*log*V* algorithm to find a path (not necessarily simple) other than *P* from *s* to *t* that is as short as possible. Assume all of the edge weights are strictly positive.
 
-<aside>
-💡 *Hint*: compute the shortest path distances from *s* to every vertex and the shortest path distances from every vertex to *t*
-
-</aside>
+>```💡 Hint: compute the shortest path distances from *s* to every vertex and the shortest path distances from every vertex to *t*```
 
 ## Answer
 
@@ -47,15 +34,9 @@ Let the edge-weighted digraph as G.
 
 **Shortest path with one skippable edge.** Given an edge-weighted digraph, design an *E*log*V* algorithm to find a shortest path from *s* to *t* where you can change the weight of any one edge to zero. Assume the edge weights are nonnegative.
 
-<aside>
-💡 Reference: [https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge](https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge)
+>```💡 Reference: https://stackoverflow.com/questions/16291676/shortest-path-with-one-skippable-edge```
 
-</aside>
-
-<aside>
-💡 *Hint*: compute the shortest path from *s* to every vertex; compute the shortest path from every vertex to *t*; combine.
-
-</aside>
+>```💡 Hint: compute the shortest path from *s* to every vertex; compute the shortest path from every vertex to *t*; combine.```
 
 ## Answer
 
