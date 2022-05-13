@@ -21,7 +21,7 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return currPic;
+        return new Picture(currPic);
     }
 
     // width of current picture
@@ -201,7 +201,7 @@ public class SeamCarver {
             rowNewPic = 0;
             for (int row = 0; row < height(); row += 1) {
                 if (row != seam[col]) {
-                    newPic.set(col, rowNewPic, currPic.get(col, row));
+                    newPic.setRGB(col, rowNewPic, currPic.getRGB(col, row));
                     rowNewPic += 1;
                 }
             }
@@ -211,7 +211,6 @@ public class SeamCarver {
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
-
         
         checkSeamValidity(seam, "vertical");
 
@@ -223,7 +222,7 @@ public class SeamCarver {
             colNewPic = 0;
             for (int col = 0; col < width(); col += 1) {
                 if (col != seam[row]) {
-                    newPic.set(colNewPic, row, currPic.get(col, row));
+                    newPic.setRGB(colNewPic, row, currPic.getRGB(col, row));
                     colNewPic += 1;
                 }
             }
