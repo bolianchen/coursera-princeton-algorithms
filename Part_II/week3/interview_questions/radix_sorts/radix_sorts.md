@@ -1,17 +1,12 @@
 # Interview Questions: Radix Sorts
 
-ContinuingDays: 0
-CreatedTime: May 14, 2022 10:55 PM
-References: https://d3c33hcgiwev3.cloudfront.net/_d169bf53912a89e4161be4f1a1aa8b67_51StringSorts.pdf?Expires=1652659200&Signature=a~LAsnqaZjAx7Q~P73hqhwebL1ax5lD1ElQa~qvgDRuM70sUB1XNSYNit1~2gdFe4N6gBbUEDqZGf40aX8VusZw~gLKOI6XnDUD8imBri1B8tbF5fDTBzfVzMBFvVSEtrPT2zsGQTSiAVh7mKcjFNDFV3xDX4nFPQxeTYRFltxk_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A
-
 ## ****Question 1****
 
 **2-sum.** Given an array *a* of *n* 64-bit integers and a target value *T*, determine whether there are two distinct integers *i* and *j* such that *ai*+*aj* = *T*. Your algorithm should run in linear time in the worst case.
 
-<aside>
-💡 Hint: sort the array in linear time.
 
-</aside>
+>```💡 Hint: sort the array in linear time.```
+
 
 ## Answer
 
@@ -25,10 +20,7 @@ It is reasonable to assume T/2 not contained in a. Moreover, it might be difficu
 
 **American flag sort.** Given an array of *n* objects with integer keys between 0 and *R*−1, design a linear-time algorithm to rearrange them in ascending order. Use extra space at most proportional to R.
 
-<aside>
-💡 *Hint:* first compute the frequency counts for each integer, which tells you where the keys need to go. Then cyclically permute the keys into their proper places.
-
-</aside>
+>```💡 Hint: first compute the frequency counts for each integer, which tells you where the keys need to go. Then cyclically permute the keys into their proper places.```
 
 ## Answer
 
@@ -53,11 +45,8 @@ The order of growth of the running time should be *nL^*2 (or better) in the wors
 
 *Signing bonus*. Do it in *NnL* time in the worst case.
 
-<aside>
-💡 *Hint:* define a fingerprint of a string in such a way that two strings are cyclic rotations of one another if and only if they have the same fingerprint.
-*Signing bonus:* design an algorithm to find the fingerprint of a string of length L*L* in time proportional to L*L* in the worst case.
+>```💡 Hint: define a fingerprint of a string in such a way that two strings are cyclic rotations of one another if and only if they have the same fingerprint. Signing bonus: design an algorithm to find the fingerprint of a string of length L in time proportional to L in the worst case.```
 
-</aside>
 
 ## Answer
 
