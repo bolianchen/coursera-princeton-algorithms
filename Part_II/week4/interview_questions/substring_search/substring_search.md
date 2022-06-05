@@ -1,9 +1,5 @@
 # Interview Questions: Substring Search
 
-ContinuingDays: 0
-CreatedTime: June 3, 2022 6:18 PM
-Source: Course
-
 ## **Question 1**
 
 **Cyclic rotation of a string.** A string *s* is a cyclic rotation of a string *t* if *s* and *t* have the same length and *s* consists of a suffix of *t* followed by a prefix of *t*. For example, "winterbreak" is a cyclic rotation of "breakwinter" (and vice versa). Design a linear-time algorithm to determine whether one string is a cyclic rotation of another.
@@ -30,10 +26,9 @@ For example, if *s* is "**abcab**cab**abcab**a" and *b* is "abcab", then "abcaba
 
 *Signing bonus*: Do it in linear time in the worst case.
 
-<aside>
-💡 *Hint:* use given a parameter *L*, find all palindromic substrings of length exactly *L* in linear time using a Karp-Rabin strategy.
-*Hint (signing bonus)*: To do it in linear time in the worst case, use *Manacher's algorithm* or suffix trees.
 
-</aside>
+>```💡 Hint:use given a parameter L, find all palindromic substrings of length exactly L in linear time using a Karp-Rabin strategy.```     
+>```💡Hint (signing bonus): To do it in linear time in the worst case, use *Manacher's algorithm* or suffix trees.```
+
 
 ## Answer
