@@ -27,7 +27,7 @@ For example, if *s* is "**abcab**cab**abcab**a" and *b* is "abcab", then "abcaba
 *Signing bonus*: Do it in linear time in the worst case.
 
 
->```💡 Hint:use given a parameter L, find all palindromic substrings of length exactly L in linear time using a Karp-Rabin strategy.```     
+>```💡Hint:use given a parameter L, find all palindromic substrings of length exactly L in linear time using a Karp-Rabin strategy.```     
 >```💡Hint (signing bonus): To do it in linear time in the worst case, use *Manacher's algorithm* or suffix trees.```
 
 
