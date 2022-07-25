@@ -4,29 +4,35 @@ import edu.princeton.cs.algs4.BinaryStdOut;
 public class MoveToFront {
     private static int R = 256;
 
-    private static int[] initializeAlphabetToOrder() {
-        int[] alphabetToOrder = new int[R];
+    private static char[] initializeAlphabet() {
+        char[] alphabet = new char[R];
         for (int i = 0; i < R; i += 1) {
-            alphabetToOrder[i] = i;
+            alphabet[i] = (char) i;
         }
-        return alphabetToOrder;
+        return alphabet;
+    }
+
+    private static void updateAlphabet(char[] alphabet, char c, int orderToFront) {
+        for (int i = orderToFront - 1; i >= 0; i -= 1) {
+            alphabet[i+1] = alphabet[i];
+        }
+        alphabet[0] = c;
     }
 
     // apply move-to-front encoding, reading from standard input and writing to standard output
     public static void encode() {
-        int[] alphabetToOrder = initializeAlphabetToOrder();
+        char[] alphabet = initializeAlphabet();
         char c;
-        int orderToFront;
+        int orderToFront = -1;
         while (!BinaryStdIn.isEmpty()) {
             c = BinaryStdIn.readChar();
-            orderToFront = alphabetToOrder[c];
-            for (int j = 0; j < R; j += 1) {
-                if (alphabetToOrder[j] < orderToFront) {
-                    alphabetToOrder[j] += 1;
-                } else if (alphabetToOrder[j] == orderToFront) {
-                    alphabetToOrder[j] = 0;
+            for (int i = 0; i < R; i += 1) {
+                if (alphabet[i] == c) {
+                    orderToFront = i;
+                    break;
                 }
             }
+            updateAlphabet(alphabet, c, orderToFront);
             BinaryStdOut.write(orderToFront, 8);
         }
         BinaryStdOut.close();
@@ -34,17 +40,14 @@ public class MoveToFront {
 
     // apply move-to-front decoding, reading from standard input and writing to standard output
     public static void decode() {
-        int[] alphabetToOrder = initializeAlphabetToOrder();
+        char[] alphabet = initializeAlphabet();
+        int orderToFront;
+        char c;
         while (!BinaryStdIn.isEmpty()) {
-            int orderToFront = BinaryStdIn.readInt(8);
-            for (int j = 0; j < R; j += 1) {
-                if (alphabetToOrder[j] < orderToFront) {
-                    alphabetToOrder[j] += 1;
-                } else if (alphabetToOrder[j] == orderToFront) {
-                    BinaryStdOut.write((char) j);
-                    alphabetToOrder[j] = 0;
-                }
-            }
+            orderToFront = BinaryStdIn.readInt(8);
+            c = alphabet[orderToFront];
+            BinaryStdOut.write(c);
+            updateAlphabet(alphabet, c, orderToFront);
         }
         BinaryStdOut.close();
     }
