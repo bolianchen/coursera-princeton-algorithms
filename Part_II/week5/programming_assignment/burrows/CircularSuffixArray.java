@@ -2,11 +2,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class CircularSuffixArray {
-    int stringLength;
-    int[] indexOfOriginalSuffix;
+    private int stringLength;
+    private int[] indexOfOriginalSuffix;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {
+        if (s == null) {
+            throw new IllegalArgumentException();
+        }
         stringLength = s.length();
         String[] circularSuffix = new String[stringLength];
         HashMap<String, Integer> suffixToIndex = new HashMap<>();
@@ -31,6 +34,9 @@ public class CircularSuffixArray {
 
     // returns index of ith sorted suffix
     public int index(int i) {
+        if (i < 0 || i > stringLength - 1) {
+            throw new IllegalArgumentException();
+        }
         return indexOfOriginalSuffix[i];
     }
 
