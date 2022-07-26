@@ -1,5 +1,8 @@
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.TreeMap;
+import java.lang.StringBuilder;
+import edu.princeton.cs.algs4.In;
 
 public class CircularSuffixArray {
     private int stringLength;
@@ -11,19 +14,27 @@ public class CircularSuffixArray {
             throw new IllegalArgumentException();
         }
         stringLength = s.length();
-        String[] circularSuffix = new String[stringLength];
-        HashMap<String, Integer> suffixToIndex = new HashMap<>();
+        String suffix;
+        TreeMap<String, ArrayList<Integer>> suffixToIndex = new TreeMap<>();
         for (int i = 0; i < stringLength; i += 1) {
-            circularSuffix[i] = s.substring(i, stringLength) + s.substring(0, i);
-            suffixToIndex.put(circularSuffix[i], i);
+            suffix = new StringBuilder(s.substring(i, stringLength)).append(s.substring(0, i)).toString();
+            if (!suffixToIndex.containsKey(suffix)) {
+                suffixToIndex.put(suffix, new ArrayList<Integer>());
+            }
+            suffixToIndex.get(suffix).add(i);
         }
 
-        String[] sortedCircularSuffix = Arrays.copyOf(circularSuffix, stringLength);
-        Arrays.sort(sortedCircularSuffix);
-
         indexOfOriginalSuffix = new int[stringLength];
-        for (int i = 0; i < stringLength; i += 1) {
-            indexOfOriginalSuffix[i] = suffixToIndex.get(sortedCircularSuffix[i]);
+        String key;
+        ArrayList<Integer> values;
+        int i = 0;
+        while (suffixToIndex.size() != 0) {
+            key = suffixToIndex.firstKey();
+            values = suffixToIndex.remove(key);
+            for (Integer v: values) {
+                indexOfOriginalSuffix[i] = v;
+                i += 1;
+            }
         }
     }
 
@@ -42,9 +53,13 @@ public class CircularSuffixArray {
 
     // unit testing (required)
     public static void main(String[] args) {
-        String s = "ABRACADABRA!";
+        In in = new In(args[0]);
+        //String s = "ABRACADABRA!";
+        String s = in.readAll();
         CircularSuffixArray csa = new CircularSuffixArray(s);
-        System.out.println(csa.index(0));
+        for (int i = 0; i < s.length(); i += 1) {
+            System.out.println(csa.index(i));
+        }
     }
 
 }
