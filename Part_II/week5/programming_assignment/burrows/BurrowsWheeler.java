@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.TreeMap;
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 public class BurrowsWheeler {
@@ -9,10 +11,9 @@ public class BurrowsWheeler {
         String s = BinaryStdIn.readString();
         CircularSuffixArray csa = new CircularSuffixArray(s);
         int sLength = csa.length();
-        //int first;
         for (int i = 0; i < sLength; i += 1) {
             if (csa.index(i) == 0) {
-                //first = i;
+                //output first
                 BinaryStdOut.write(i);
                 break;
             }
@@ -31,29 +32,37 @@ public class BurrowsWheeler {
     // reading from standard input and writing to standard output
     public static void inverseTransform() {
         int first = BinaryStdIn.readInt();
-        String input = BinaryStdIn.readString();
-        int sLength = input.length();
-        char[] t = input.toCharArray();
-        char[] f = Arrays.copyOf(t, sLength);
-        Arrays.sort(f);
-        int[] next = new int[sLength];
+        String lastColumnOfSortedSuffix = BinaryStdIn.readString();
+        int sLength = lastColumnOfSortedSuffix.length();
+        char[] lastColumnArray = lastColumnOfSortedSuffix.toCharArray();
+        TreeMap<Character, ArrayList<Integer>> tToIndex = new TreeMap<>();
         for (int i = 0; i < sLength; i += 1) {
-            for (int j = 0; j < sLength; j += 1) {
-                if (f[i] == t[j]) {
-                    next[i] = j;
-                    if (i + 1 < sLength && f[i] == f[i+1]) {
-                        i += 1;
-                    }
-                }
+            if (!tToIndex.containsKey(lastColumnArray[i])) {
+                tToIndex.put(lastColumnArray[i], new ArrayList<Integer>());
+            }
+            tToIndex.get(lastColumnArray[i]).add(i);
+        }
+
+        char[] firstColumnArray = new char[sLength];
+        int[] next = new int[sLength];
+        char key;
+        ArrayList<Integer> values;
+
+        int j = 0;
+        while (tToIndex.size() != 0) {
+            key = tToIndex.firstKey();
+            values = tToIndex.remove(key);
+            for (Integer v: values) {
+                firstColumnArray[j] = key;
+                next[j] = v;
+                j += 1;
             }
         }
-        int i = first;
-        while (true) {
-            BinaryStdOut.write(f[i]);
-            i = next[i];
-            if (i == first) {
-                break;
-            }
+
+        int indexToCheckNext = first;
+        for (int k = 0; k < sLength; k += 1) {
+            BinaryStdOut.write(firstColumnArray[indexToCheckNext]);
+            indexToCheckNext = next[indexToCheckNext];
         }
         BinaryStdOut.close();
     }
