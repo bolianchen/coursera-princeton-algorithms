@@ -6,35 +6,68 @@ import edu.princeton.cs.algs4.In;
 
 public class CircularSuffixArray {
     private int stringLength;
-    private int[] indexOfOriginalSuffix;
+    private int[] indexAtOriginalSuffix;
+    private String originalString;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {
         if (s == null) {
             throw new IllegalArgumentException();
         }
+        originalString = s;
         stringLength = s.length();
-        String suffix;
-        TreeMap<String, ArrayList<Integer>> suffixToIndex = new TreeMap<>();
+        CircularSuffix suffix;
+        ArrayList<Integer> indices;
+        TreeMap<CircularSuffix, ArrayList<Integer>> suffixToIndex = new TreeMap<>();
         for (int i = 0; i < stringLength; i += 1) {
-            suffix = new StringBuilder(s.substring(i, stringLength)).append(s.substring(0, i)).toString();
+            suffix = new CircularSuffix(i);
             if (!suffixToIndex.containsKey(suffix)) {
-                suffixToIndex.put(suffix, new ArrayList<Integer>());
+                indices = new ArrayList<Integer>();
+                indices.add(i);
+                suffixToIndex.put(suffix, indices);
+            } else {
+                suffixToIndex.get(suffix).add(i);
             }
-            suffixToIndex.get(suffix).add(i);
         }
 
-        indexOfOriginalSuffix = new int[stringLength];
-        String key;
-        ArrayList<Integer> values;
+        indexAtOriginalSuffix = new int[stringLength];
         int i = 0;
         while (suffixToIndex.size() != 0) {
-            key = suffixToIndex.firstKey();
-            values = suffixToIndex.remove(key);
-            for (Integer v: values) {
-                indexOfOriginalSuffix[i] = v;
+            suffix = suffixToIndex.firstKey();
+            indices = suffixToIndex.remove(suffix);
+            for (Integer index: indices) {
+                indexAtOriginalSuffix[i] = index;
                 i += 1;
             }
+        }
+    }
+
+    /*
+     * Inner class for sorting suffixes without duplicate strings
+     */
+    private class CircularSuffix implements Comparable<CircularSuffix> {
+        private String s;
+        private int sLength;
+        private int firstIndex;
+
+        public CircularSuffix(int i) {
+            s = originalString;
+            sLength = s.length();
+            firstIndex = i;
+        }
+        public int compareTo(CircularSuffix cs) {
+            int otherFirstIndex = cs.firstIndex;
+            for (int i = 0; i < sLength; i += 1) {
+                if (charAt(i) > cs.charAt(i)) {
+                    return 1;
+                } else if (charAt(i) < cs.charAt(i)) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+        public char charAt(int i) {
+            return s.charAt((firstIndex + i) % sLength);
         }
     }
 
@@ -48,13 +81,12 @@ public class CircularSuffixArray {
         if (i < 0 || i > stringLength - 1) {
             throw new IllegalArgumentException();
         }
-        return indexOfOriginalSuffix[i];
+        return indexAtOriginalSuffix[i];
     }
 
     // unit testing (required)
     public static void main(String[] args) {
         In in = new In(args[0]);
-        //String s = "ABRACADABRA!";
         String s = in.readAll();
         CircularSuffixArray csa = new CircularSuffixArray(s);
         for (int i = 0; i < s.length(); i += 1) {
