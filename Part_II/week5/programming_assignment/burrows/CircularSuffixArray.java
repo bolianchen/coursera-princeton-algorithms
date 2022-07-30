@@ -1,114 +1,112 @@
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.TreeMap;
-import java.lang.StringBuilder;
 import edu.princeton.cs.algs4.In;
 
 public class CircularSuffixArray {
-    private int R;
-    private String originalString;
-    private int stringLength;
-    private int[] indexAtOriginalSuffix;
-    private int CUTOFF = 0;
-
-    // Inner class for sorting suffixes without duplicate strings
-    private class CircularSuffix {
-        private String s = originalString;
-        private int firstIndex;
-
-        public CircularSuffix(int i) {
-            firstIndex = i;
-        }
-
-        public int charAt(int i) {
-            return s.charAt((firstIndex + i) % s.length());
-        }
-    }
+    private final int R = 256;
+    private final String originalString;
+    private final int stringLength;
+    private final int[] indexAtOriginalSuffix;
+    private final int CUTOFF = 15;
 
     // circular suffix array of s
     public CircularSuffixArray(String s) {
         if (s == null) {
             throw new IllegalArgumentException();
         }
-        R = 256;
         originalString = s;
         stringLength = s.length();
 
-        CircularSuffix[] suffixes = new CircularSuffix[stringLength];
+        int[] suffixes = new int[stringLength];
         for (int i = 0; i < stringLength; i += 1) {
-            suffixes[i] = new CircularSuffix(i);
+            suffixes[i] = i;
         }
 
         // sorting suffixes
-        sortCircularSuffixes(suffixes);
+        sortSuffixes(suffixes);
 
         indexAtOriginalSuffix = new int[stringLength];
         for (int i = 0; i < stringLength; i += 1) {
-            indexAtOriginalSuffix[i] = suffixes[i].firstIndex;
+            indexAtOriginalSuffix[i] = suffixes[i];
         }
     }
 
-    private void sortCircularSuffixes(CircularSuffix[] css) {
-        CircularSuffix[] aux = new CircularSuffix[stringLength];
-        sortCircularSuffixesHelper(css, 0, stringLength - 1, 0, aux);
+    // MSD radix sort
+    private void sortSuffixes(int[] suffixes) {
+        int[] aux = new int[stringLength];
+        sortSuffixesHelper(suffixes, 0, stringLength - 1, 0, aux);
     }
 
-    private void sortCircularSuffixesHelper(CircularSuffix[] css, int lo,
-            int hi, int d, CircularSuffix[] auxCss) {
-        // CUTOFF
+    private void sortSuffixesHelper(int[] suffixes, int lo,
+            int hi, int d, int[] aux) {
 
+        // switch to insertion sort when the subarray to sort is short
         if (hi <= lo + CUTOFF) {
-            //insertionSort(css, lo, hi, d);
+            insertionSort(suffixes, lo, hi, d);
             return;
         }
 
         // compute frequency counts
         int[] count = new int[R + 2];
         for (int i = lo; i <= hi; i += 1) {
-            count[charAt(css[i], d) + 2] += 1;
+            count[charAt(suffixes[i], d) + 2] += 1;
         }
 
         // transform counts to indices
-        for (int r = 0; r < R + 1 ; r += 1) {
+        for (int r = 0; r < R + 1; r += 1) {
             count[r + 1] += count[r];
         }
 
         // distribute
         for (int i = lo; i <= hi; i += 1) {
-            auxCss[count[charAt(css[i], d) + 1]++] = css[i];
+            aux[count[charAt(suffixes[i], d) + 1]++] = suffixes[i];
         }
 
         // copy back
         for (int i = lo; i <= hi; i += 1) {
-            css[i] = auxCss[i - lo];
+            suffixes[i] = aux[i - lo];
         }
 
         // recursively sort for each character
         for (int r = 0; r < R; r += 1) {
-            sortCircularSuffixesHelper(css, lo + count[r], lo + count[r + 1] - 1, d + 1, auxCss);
+            sortSuffixesHelper(suffixes, lo + count[r], lo + count[r + 1] - 1, d + 1, aux);
         }
     }
 
-    //private void insertionSort(CircularSuffix[] css, int lo, int hi, int d) {
-    //    if (hi <= lo || d == stringLength) {
-    //        return;
-    //    }
-    //    int j;
-    //    CircularSuffix cs;
-    //    for (int i = lo; i <= hi; i += 1) {
-    //        for (int j = i; j > lo 
-    //        
-    //    }
-    //}
+    private void insertionSort(int[] suffixes, int lo, int hi, int d) {
+        if (hi <= lo || d == stringLength) {
+            return;
+        }
+        for (int i = lo; i <= hi; i += 1) {
+            for (int j = i; j > lo && less(suffixes[j], suffixes[j-1], d); j -= 1) {
+                exch(suffixes, j, j - 1);
+            }
+        }
+    }
 
-    private int charAt(CircularSuffix cs, int d) {
+    private boolean less(int suffix1, int suffix2, int d) {
+        for (int w = d; w < stringLength; w += 1) {
+            if (charAt(suffix1, w) < charAt(suffix2, w)) {
+                return true;
+            }
+            if (charAt(suffix1, w) > charAt(suffix2, w)) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private void exch(int[] suffixes, int i, int j) {
+        int temp = suffixes[i];
+        suffixes[i] = suffixes[j];
+        suffixes[j] = temp;
+    }
+
+    private int charAt(int suffix, int d) {
         if (d == stringLength) {
             return -1;
         }
-        return cs.charAt(d);
+        int index = (suffix + d) % stringLength;
+        return originalString.charAt(index);
     }
-
-
 
     // length of s
     public int length() {

@@ -1,6 +1,3 @@
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.TreeMap;
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 public class BurrowsWheeler {
@@ -13,7 +10,7 @@ public class BurrowsWheeler {
         int sLength = csa.length();
         for (int i = 0; i < sLength; i += 1) {
             if (csa.index(i) == 0) {
-                //output first
+                // output first
                 BinaryStdOut.write(i);
                 break;
             }
@@ -34,37 +31,55 @@ public class BurrowsWheeler {
         int first = BinaryStdIn.readInt();
         String lastColumnOfSortedSuffix = BinaryStdIn.readString();
         int sLength = lastColumnOfSortedSuffix.length();
-        char[] lastColumnArray = lastColumnOfSortedSuffix.toCharArray();
-        TreeMap<Character, ArrayList<Integer>> tToIndex = new TreeMap<>();
-        for (int i = 0; i < sLength; i += 1) {
-            if (!tToIndex.containsKey(lastColumnArray[i])) {
-                tToIndex.put(lastColumnArray[i], new ArrayList<Integer>());
-            }
-            tToIndex.get(lastColumnArray[i]).add(i);
-        }
 
-        char[] firstColumnArray = new char[sLength];
+        // initialize char and int arrays that would respectively be used
+        // to store characters at first column and the corresponding next index
+        // of the sorted suffixes
+        char[] firstColumn = new char[sLength];
         int[] next = new int[sLength];
-        char key;
-        ArrayList<Integer> values;
-
-        int j = 0;
-        while (tToIndex.size() != 0) {
-            key = tToIndex.firstKey();
-            values = tToIndex.remove(key);
-            for (Integer v: values) {
-                firstColumnArray[j] = key;
-                next[j] = v;
-                j += 1;
-            }
+        for (int i = 0; i < sLength; i += 1) {
+            firstColumn[i] = lastColumnOfSortedSuffix.charAt(i);
+            next[i] = i;
         }
+        // use key indexed counting to complete the two arrays
+        keyIndexedCounting(firstColumn, next);
 
         int indexToCheckNext = first;
         for (int k = 0; k < sLength; k += 1) {
-            BinaryStdOut.write(firstColumnArray[indexToCheckNext]);
+            BinaryStdOut.write(firstColumn[indexToCheckNext]);
             indexToCheckNext = next[indexToCheckNext];
         }
         BinaryStdOut.close();
+    }
+
+    private static void keyIndexedCounting(char[] a, int[] indices) {
+        int n = a.length;
+        int R = 256;
+        char[] aux = new char[n];
+        int[] auxIndices = new int[n];
+        int[] count = new int[R + 1];
+
+        // compute frequency counts
+        for (int i = 0; i < n; i += 1) {
+            count[a[i] + 1] += 1;
+        }
+
+        // compute cumulates
+        for (int r = 0; r < R; r += 1) {
+            count[r + 1] += count[r];
+        }
+
+        // move data
+        for (int i = 0; i < n; i += 1) {
+            aux[count[a[i]]] = a[i];
+            auxIndices[count[a[i]]] = indices[i];
+            count[a[i]] += 1;
+        }
+        // copy back
+        for (int i = 0; i < n; i += 1) {
+            a[i] = aux[i];
+            indices[i] = auxIndices[i];
+        }
     }
 
     // if args[0] is "-", apply Burrows-Wheeler transform
