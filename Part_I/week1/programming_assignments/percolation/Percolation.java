@@ -14,7 +14,7 @@ public class Percolation {
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
-        gridSize = n + 1;
+        gridSize = n;
         numOfOpened = 0;
         opened = new boolean[gridSize][gridSize];
         connectedToTop = new boolean[gridSize][gridSize];
@@ -24,7 +24,7 @@ public class Percolation {
     }
 
     private void checkCornerCoordinates(int row, int col) {
-        if ((row < 1 || row >= gridSize) || (col < 1 || col >= gridSize)) {
+        if ((row < 1 || row > gridSize) || (col < 1 || col > gridSize)) {
             throw new IllegalArgumentException();
         }
     }
@@ -34,14 +34,14 @@ public class Percolation {
         checkCornerCoordinates(row, col);
 
         if (!isOpen(row, col)) {
-            opened[row][col] = true;
+            opened[row - 1][col - 1] = true;
             if (row == 1) {
-                connectedToTop[row][col] = true;
+                connectedToTop[row - 1][col - 1] = true;
             }
-            if (row == gridSize - 1) {
-                connectedToBottom[row][col] = true;
+            if (row == gridSize) {
+                connectedToBottom[row - 1][col - 1] = true;
             }
-            if (connectedToTop[row][col] && connectedToBottom[row][col]) {
+            if (connectedToTop[row - 1][col - 1] && connectedToBottom[row - 1][col - 1]) {
                 isPercolating = true;
             }
 
@@ -72,15 +72,15 @@ public class Percolation {
                     rootId = gridManager.find(rootId);
                     rootCoordinates = ufIdToRowCol(rootId);
 
-                    if (connectedToTop[rootRow][rootCol] || connectedToTop[otherRootRow][otherRootCol]) {
-                        connectedToTop[rootCoordinates[0]][rootCoordinates[1]] = true;
+                    if (connectedToTop[rootRow - 1][rootCol - 1] || connectedToTop[otherRootRow - 1][otherRootCol - 1]) {
+                        connectedToTop[rootCoordinates[0] - 1][rootCoordinates[1] - 1] = true;
 
                     }
-                    if (connectedToBottom[rootRow][rootCol] || connectedToBottom[otherRootRow][otherRootCol]) {
-                        connectedToBottom[rootCoordinates[0]][rootCoordinates[1]] = true;
+                    if (connectedToBottom[rootRow - 1][rootCol - 1] || connectedToBottom[otherRootRow - 1][otherRootCol - 1]) {
+                        connectedToBottom[rootCoordinates[0] - 1][rootCoordinates[1] - 1] = true;
                     }
 
-                    if (connectedToTop[rootCoordinates[0]][rootCoordinates[1]] && connectedToBottom[rootCoordinates[0]][rootCoordinates[1]]) {
+                    if (connectedToTop[rootCoordinates[0] - 1][rootCoordinates[1] - 1] && connectedToBottom[rootCoordinates[0] - 1][rootCoordinates[1] - 1]) {
                         isPercolating = true;
                     }
                 }
@@ -89,32 +89,28 @@ public class Percolation {
         }
     }
 
-    private void connectAdjSites(int row, int col) {
-
-    }
-
     private boolean isValidCoordinates(int row, int col) {
-        if (row < 1 || row >= gridSize || col < 1 || col >= gridSize) {
+        if (row < 1 || row > gridSize || col < 1 || col > gridSize) {
             return false;
         }
         return true;
     }
 
     private int rowColToUFId(int row, int col) {
-        return gridSize * row + col;
+        return gridSize * (row - 1) + (col - 1);
     }
 
     private int[] ufIdToRowCol(int id) {
         int[] rcCoordinates = new int[2];
-        rcCoordinates[0] = id / gridSize;
-        rcCoordinates[1] = id % gridSize;
+        rcCoordinates[0] = id / gridSize + 1;
+        rcCoordinates[1] = id % gridSize + 1;
         return rcCoordinates;
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
         checkCornerCoordinates(row, col);
-        return opened[row][col];
+        return opened[row - 1][col - 1];
     }
 
     // is the site (row, col) full?
@@ -123,7 +119,7 @@ public class Percolation {
         int id = rowColToUFId(row, col);
         int rootId = gridManager.find(id);
         int[] rootCoordinates = ufIdToRowCol(rootId);
-        return connectedToTop[rootCoordinates[0]][rootCoordinates[1]];
+        return connectedToTop[rootCoordinates[0] - 1][rootCoordinates[1] - 1];
     }
 
     // returns the number of open sites
