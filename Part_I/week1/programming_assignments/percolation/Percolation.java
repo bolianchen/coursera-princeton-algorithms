@@ -2,104 +2,138 @@ import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private final WeightedQuickUnionUF grid;
-    private final WeightedQuickUnionUF grid2;
-    private final int size;
-    private final boolean[][] opened;
-    private int numOpenSites;
+        private final int gridSize;
+        private int numOfOpened;
+        private boolean[][] opened, connectedToTop, connectedToBottom;
+        private boolean isPercolating;
+        private final WeightedQuickUnionUF gridManager;
+        private final int[][] shiftsOfAdjCoordinates = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
         
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
-        // add two respectively as the virtual top and bottom sites
-        size = n;
-        grid = new WeightedQuickUnionUF(n*n + 2);
-        grid2 = new WeightedQuickUnionUF(n*n + 2);
-        numOpenSites = 0;
-        opened = new boolean[n][n];
+        gridSize = n + 1;
+        numOfOpened = 0;
+        opened = new boolean[gridSize][gridSize];
+        connectedToTop = new boolean[gridSize][gridSize];
+        connectedToBottom = new boolean[gridSize][gridSize];
+        isPercolating = false;
+        gridManager = new WeightedQuickUnionUF((gridSize) * (gridSize));
     }
 
-    // helper methods to check if row and column indices are between 1 and n
-    // applied in the open, isOpen and isFull methods
-    private void checkIndices(int row, int col) {
-        if ((row < 1 || row > size) || (col < 1 || col > size)) {
+    private void checkCornerCoordinates(int row, int col) {
+        if ((row < 1 || row >= gridSize) || (col < 1 || col >= gridSize)) {
             throw new IllegalArgumentException();
         }
-    }
-    private boolean isIndicesValid(int row, int col) {
-        if ((row < 1 || row > size) || (col < 1 || col > size)) {
-            return false;
-        }
-        return true;
-    }
-    
-    // a helper function to connect the newly opened site to its adjacent open sites
-    // (row-1, col), (row+1, col), (row, col-1), (row, col+1)
-    // if row==1, connect to top; if row=n, connect to bottom
-    private void connectAdjs(int row, int col) {
-        if (row == 1) {
-            grid.union(0, indices2UFid(row, col)); 
-            grid2.union(0, indices2UFid(row, col)); 
-        }
-        if (row == size) {
-            grid.union(indices2UFid(row, col), size*size + 1); 
-        }
-
-        for (int r = row - 1; r <= row + 1; r = r + 1) {
-            if (isIndicesValid(r, col) && isOpen(r, col)) {
-                grid.union(indices2UFid(r, col), indices2UFid(row, col));
-                grid2.union(indices2UFid(r, col), indices2UFid(row, col));
-            }
-        }
-
-        for (int c = col - 1; c <= col + 1; c = c + 1) {
-            if (isIndicesValid(row, c) && isOpen(row, c)) {
-                grid.union(indices2UFid(row, c), indices2UFid(row, col));
-                grid2.union(indices2UFid(row, c), indices2UFid(row, col));
-            }
-        }
-    }
-
-    // a helper method to convert (row, col) to the corresponding union-find id
-    private int indices2UFid(int row, int col) {
-        return 1 + (row-1) * size + (col-1);
     }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        checkIndices(row, col);
-        if (isOpen(row, col)) {
-            return;
+        checkCornerCoordinates(row, col);
+
+        if (!isOpen(row, col)) {
+            opened[row][col] = true;
+            if (row == 1) {
+                connectedToTop[row][col] = true;
+            }
+            if (row == gridSize - 1) {
+                connectedToBottom[row][col] = true;
+            }
+            if (connectedToTop[row][col] && connectedToBottom[row][col]) {
+                isPercolating = true;
+            }
+
+            // connected with its adjacent sites
+            int otherRow, otherCol, rootId, otherRootId;
+            int[] rootCoordinates, otherRootCoordinates;
+            int rootRow, rootCol, otherRootRow, otherRootCol;
+            // there might be no valid shifts
+            for (int[] shift: shiftsOfAdjCoordinates) {
+                // root of tree#1
+                rootId = gridManager.find(rowColToUFId(row, col));
+                rootCoordinates = ufIdToRowCol(rootId);
+                rootRow = rootCoordinates[0];
+                rootCol = rootCoordinates[1];
+                otherRow = row + shift[0];
+                otherCol = col + shift[1];
+                if (isValidCoordinates(otherRow, otherCol) && isOpen(otherRow, otherCol)) {
+                    // root of tree#2
+                    otherRootId = gridManager.find(rowColToUFId(otherRow, otherCol));
+                    otherRootCoordinates = ufIdToRowCol(otherRootId);
+                    otherRootRow = otherRootCoordinates[0];
+                    otherRootCol = otherRootCoordinates[1];
+
+                    // new tree formed after union
+                    // in Test 17 and 21, the root could be randomly reset to be neither 
+                    // the roots of the two child trees
+                    gridManager.union(rootId, otherRootId);
+                    rootId = gridManager.find(rootId);
+                    rootCoordinates = ufIdToRowCol(rootId);
+
+                    if (connectedToTop[rootRow][rootCol] || connectedToTop[otherRootRow][otherRootCol]) {
+                        connectedToTop[rootCoordinates[0]][rootCoordinates[1]] = true;
+
+                    }
+                    if (connectedToBottom[rootRow][rootCol] || connectedToBottom[otherRootRow][otherRootCol]) {
+                        connectedToBottom[rootCoordinates[0]][rootCoordinates[1]] = true;
+                    }
+
+                    if (connectedToTop[rootCoordinates[0]][rootCoordinates[1]] && connectedToBottom[rootCoordinates[0]][rootCoordinates[1]]) {
+                        isPercolating = true;
+                    }
+                }
+            }
+            numOfOpened += 1;
         }
-        opened[row-1][col-1] = true;
-        connectAdjs(row, col);
-        numOpenSites += 1;
+    }
+
+    private void connectAdjSites(int row, int col) {
+
+    }
+
+    private boolean isValidCoordinates(int row, int col) {
+        if (row < 1 || row >= gridSize || col < 1 || col >= gridSize) {
+            return false;
+        }
+        return true;
+    }
+
+    private int rowColToUFId(int row, int col) {
+        return gridSize * row + col;
+    }
+
+    private int[] ufIdToRowCol(int id) {
+        int[] rcCoordinates = new int[2];
+        rcCoordinates[0] = id / gridSize;
+        rcCoordinates[1] = id % gridSize;
+        return rcCoordinates;
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        checkIndices(row, col);
-        return opened[row-1][col-1];
+        checkCornerCoordinates(row, col);
+        return opened[row][col];
     }
 
     // is the site (row, col) full?
-    // a full site is an open site can be connected to an open site in the top row
-    // via a chain of neighboring open sites
     public boolean isFull(int row, int col) {
-        checkIndices(row, col);
-        return grid2.find(0) == grid2.find(indices2UFid(row, col));
+        checkCornerCoordinates(row, col);
+        int id = rowColToUFId(row, col);
+        int rootId = gridManager.find(id);
+        int[] rootCoordinates = ufIdToRowCol(rootId);
+        return connectedToTop[rootCoordinates[0]][rootCoordinates[1]];
     }
 
     // returns the number of open sites
     public int numberOfOpenSites() {
-        return numOpenSites;
+        return numOfOpened;
     }
 
     // does the system percolate?
     public boolean percolates() {
-        return grid.find(0) == grid.find(size*size+1);
+        return isPercolating;
     }
 
     // test client (optional)
